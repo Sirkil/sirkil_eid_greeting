@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sirkil Eid Greeting</title>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+    /* Reset margins to prevent accidental overflow */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #1a1a1a;
+      color: #ffffff;
+      
+      /* FIX 1: Use min-height instead of fixed height, and use 'dvh' for Safari's dynamic bars */
+      min-height: 100vh; /* Fallback for older browsers */
+      min-height: 100dvh; /* Adapts to Safari's bottom search bar shrinking/expanding */
+      
+      width: 100vw;
+      
+      /* FIX 2: Allow vertical scrolling, prevent horizontal scrolling */
+      overflow-x: hidden; 
+      overflow-y: auto; 
+      
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+      
+      /* FIX 3: Extra padding at the bottom so the button fully clears Safari's navigation area */
+      padding-bottom: 40px; 
+    }
+
+    /* Dynamic Canvas Container - Moved to Top */
+    .canvas-wrapper {
+      flex-grow: 1; /* Tells the wrapper to fill all remaining vertical space */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 0; /* CRITICAL: Allows the flex container to shrink past its content size, preventing overflow */
+      width: 100%;
+    }
+
+    canvas {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain; /* Shrinks the image proportionally to fit the screen */
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+
+    /* Bottom Controls Area - Moved under canvas, added border and shadow */
+    .controls {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 800px;
+      margin: 15px auto 0 auto; /* Margin top instead of bottom */
+      flex-shrink: 0; /* Ensures the control bar never gets squished */
+  
+      /* New border and shadow styling */
+      border: 1px solid #444;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      padding: 15px;
+      border-radius: 12px;
+      background-color: #222; 
+    }
+
+    input, button {
+      font-family: 'Poppins', sans-serif;
+      padding: 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    input {
+      flex-grow: 1; /* Input field takes up available width */
+      background-color: #2a2a2a; /* Slightly lighter input background */
+      color: #fff;
+    }
+
+    input::placeholder {
+      color: #888;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 600;
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    #downloadBtn {
+      background-color: #008CBA;
+    }
+
+    /* Mobile adjustments: Stack inputs/buttons on extremely narrow screens */
+    @media (max-width: 450px) {
+      .controls {
+        flex-direction: column;
+      }
+      button, input {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Canvas Wrapper is now First -->
+  <div class="canvas-wrapper">
+    <canvas id="imageCanvas"></canvas>
+  </div>
+
+  <!-- Controls Container is now Underneath -->
+  <div class="controls">
+    <input type="text" id="nameInput" placeholder="Enter your name">
+    <button id="downloadBtn">Download</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('imageCanvas');
+    const ctx = canvas.getContext('2d');
+    const nameInput = document.getElementById('nameInput');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    // Load the image asset
+    const img = new Image();
+    // Replaced with the verbatim image name requested
+    img.src = 'flyer.png'; 
+    
+    // Position where the text will appear on the image
+    let textX; // Will be set dynamically when the image loads
+    const textY = 1515; 
+
+    // Draw the initial image once it loads
+    img.onload = () => {
+      // The internal resolution of the canvas matches the image exactly.
+      canvas.width = img.width;
+      canvas.height = img.height;
+      
+      // CRITICAL FIX: Set X coordinate to exactly half the canvas width
+      textX = canvas.width / 2; 
+      
+      ctx.drawImage(img, 0, 0);
+    };
+
+    // --- Real-time Typing Logic ---
+    // This draws the text instantly as the user types
+    nameInput.addEventListener('input', () => {
+      
+      // Redraw the base image to clear the previous text frame
+      ctx.drawImage(img, 0, 0);
+
+      const text = nameInput.value;
+      if (text) {
+        ctx.font = "Normal 54px 'Montserrat'"; 
+        ctx.fillStyle = "#ddf07f"; 
+        ctx.textAlign = "center"; // Centers the text block around the textX coordinate
+        ctx.fillText(text, textX, textY);
+      }
+    });
+
+    // --- Download Button Logic ---
+    downloadBtn.addEventListener('click', () => {
+      const dataURL = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = 'Sirkil Eid Greeting.png';
+      link.href = dataURL;
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  </script>
+</body>
+</html>
